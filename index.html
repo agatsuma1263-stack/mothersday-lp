@@ -15,7 +15,7 @@
     .product{margin-bottom:28px;}
     .product-img{background:#fff;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
     .product-img img{width:100%;height:100%;object-fit:contain;padding:20px;box-sizing:border-box;}
-    .carousel{position:relative;background:#fff;aspect-ratio:4/3;overflow:hidden;touch-action:pan-y;}
+    .carousel{position:relative;background:#fff;aspect-ratio:4/3;overflow:hidden;touch-action:pan-y;user-select:none;cursor:grab;}
     .carousel-track{display:flex;height:100%;transition:transform 0.8s ease;}
     .carousel-slide{flex:0 0 100%;height:100%;display:flex;align-items:center;justify-content:center;}
     .carousel-slide img{width:100%;height:100%;object-fit:contain;padding:20px;box-sizing:border-box;}
@@ -155,77 +155,98 @@
     var dots = carousel.querySelectorAll('.carousel-dot');
     var index = 0;
     var interval = null;
+    var startX = 0;
+    var currentX = 0;
+    var isDragging = false;
 
-    function update(){
-      track.style.transform = 'translateX(' + (-100 * index) + '%)';
-      dots.forEach(function(dot, i){ dot.classList.toggle('active', i === index); });
+    function totalSlides(){
+      return track.children.length;
     }
 
-    function next(){
-      var total = track.children.length;
-      index = (index + 1) % total;
-      update();
+    function update(withTransition){
+      track.style.transition = withTransition === false ? 'none' : 'transform 0.8s ease';
+      track.style.transform = 'translateX(' + (-100 * index) + '%)';
+      dots.forEach(function(dot, i){
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    function moveNext(){
+      index = (index + 1) % totalSlides();
+      update(true);
+    }
+
+    function movePrev(){
+      index = (index - 1 + totalSlides()) % totalSlides();
+      update(true);
     }
 
     function startAuto(){
       stopAuto();
-      interval = setInterval(next, 4000);
+      interval = setInterval(moveNext, 5000);
     }
 
     function stopAuto(){
-      if(interval){ clearInterval(interval); interval = null; }
+      if(interval){
+        clearInterval(interval);
+        interval = null;
+      }
     }
 
     carousel.querySelector('[data-prev]').addEventListener('click', function(){
-      var total = track.children.length;
-      index = (index - 1 + total) % total;
-      update();
+      movePrev();
       startAuto();
     });
 
     carousel.querySelector('[data-next]').addEventListener('click', function(){
-      next();
+      moveNext();
       startAuto();
     });
 
     carousel.addEventListener('mouseenter', stopAuto);
     carousel.addEventListener('mouseleave', startAuto);
 
-    var startX = 0;
-    var currentX = 0;
-    var isDragging = false;
-
-    carousel.addEventListener('touchstart', function(e){
-      startX = e.touches[0].clientX;
-      currentX = startX;
+    carousel.addEventListener('pointerdown', function(e){
       isDragging = true;
+      startX = e.clientX;
+      currentX = startX;
       stopAuto();
-    }, { passive: true });
+      carousel.setPointerCapture(e.pointerId);
+      carousel.style.cursor = 'grabbing';
+    });
 
-    carousel.addEventListener('touchmove', function(e){
+    carousel.addEventListener('pointermove', function(e){
       if(!isDragging) return;
-      currentX = e.touches[0].clientX;
-    }, { passive: true });
+      currentX = e.clientX;
+      var diff = currentX - startX;
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(calc(' + (-100 * index) + '% + ' + diff + 'px))';
+    });
 
-    carousel.addEventListener('touchend', function(){
+    carousel.addEventListener('pointerup', function(e){
       if(!isDragging) return;
       var diff = currentX - startX;
-      var total = track.children.length;
+      isDragging = false;
+      carousel.style.cursor = 'grab';
 
-      if(Math.abs(diff) > 40){
-        if(diff < 0){
-          index = (index + 1) % total;
-        } else {
-          index = (index - 1 + total) % total;
-        }
-        update();
+      if(Math.abs(diff) > 45){
+        if(diff < 0){ moveNext(); }
+        else { movePrev(); }
+      } else {
+        update(true);
       }
 
-      isDragging = false;
       startAuto();
     });
 
-    update();
+    carousel.addEventListener('pointercancel', function(){
+      isDragging = false;
+      carousel.style.cursor = 'grab';
+      update(true);
+      startAuto();
+    });
+
+    update(true);
     startAuto();
   });
 </script>
