@@ -13,8 +13,6 @@
     .text{font-size:12px;color:#666;text-align:center;line-height:1.6;}
     .badge{font-size:11px;color:#e91e63;text-align:center;margin-top:8px;}
     .product{margin-bottom:28px;}
-    .product-img{background:#fff;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
-    .product-img img{width:100%;height:100%;object-fit:contain;padding:20px;box-sizing:border-box;}
     .carousel{position:relative;background:#fff;aspect-ratio:4/3;overflow:hidden;touch-action:pan-y;user-select:none;cursor:grab;}
     .carousel-track{display:flex;height:100%;transition:transform 0.8s ease;}
     .carousel-slide{flex:0 0 100%;height:100%;display:flex;align-items:center;justify-content:center;}
@@ -35,9 +33,131 @@
     footer{text-align:center;padding:24px 16px;border-top:1px solid #eee;}
     .insta-btn{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 16px;border:1px solid #ccc;border-radius:999px;text-decoration:none;color:#333;font-size:13px;}
     .copy{font-size:10px;color:#aaa;margin-top:12px;}
+
+    .coupon-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:9999;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .3s ease, visibility .3s ease;
+    }
+    .coupon-modal.show{
+      opacity:1;
+      visibility:visible;
+    }
+    .coupon-card{
+      width:100%;
+      max-width:360px;
+      background:#fff;
+      border-radius:18px;
+      overflow:hidden;
+      position:relative;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+    }
+    .coupon-close{
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      border:1px solid #eee;
+      background:rgba(255,255,255,.9);
+      font-size:18px;
+      line-height:1;
+      cursor:pointer;
+      color:#555;
+      z-index:2;
+    }
+    .coupon-visual{
+      padding:30px 22px 24px;
+      text-align:center;
+      background:linear-gradient(180deg,#fff7f8 0%,#fff 100%);
+      border:1px solid #f4d5db;
+      margin:14px;
+      border-radius:14px;
+    }
+    .coupon-shop{
+      font-size:12px;
+      letter-spacing:.18em;
+      color:#9b777d;
+      margin-bottom:12px;
+    }
+    .coupon-title{
+      font-size:18px;
+      font-weight:600;
+      color:#222;
+      margin-bottom:10px;
+    }
+    .coupon-off{
+      font-size:48px;
+      line-height:1;
+      font-weight:700;
+      color:#d86a82;
+      margin:8px 0;
+    }
+    .coupon-sub{
+      font-size:12px;
+      color:#666;
+      line-height:1.7;
+      margin-top:10px;
+    }
+    .coupon-code{
+      display:inline-block;
+      margin-top:16px;
+      padding:9px 18px;
+      border:1px dashed #d86a82;
+      color:#333;
+      font-size:14px;
+      letter-spacing:.12em;
+      background:#fff;
+    }
+    .coupon-action{
+      padding:0 22px 22px;
+    }
+    .coupon-btn{
+      display:block;
+      width:100%;
+      text-align:center;
+      box-sizing:border-box;
+      padding:13px 16px;
+      border-radius:999px;
+      background:#222;
+      color:#fff;
+      text-decoration:none;
+      font-size:14px;
+    }
+    .coupon-note{
+      font-size:10px;
+      color:#999;
+      text-align:center;
+      margin-top:10px;
+      line-height:1.5;
+    }
   </style>
 </head>
 <body>
+<div class="coupon-modal" id="couponModal">
+  <div class="coupon-card">
+    <button class="coupon-close" type="button" id="couponClose">×</button>
+    <div class="coupon-visual" role="img" aria-label="ギフトショップCompass オープン記念10%OFFクーポン">
+      <div class="coupon-shop">GIFT SHOP Compass</div>
+      <div class="coupon-title">オープン記念クーポン</div>
+      <div class="coupon-off">10% OFF</div>
+      <div class="coupon-sub">母の日ギフトに使える<br>特別クーポンをご用意しました。</div>
+      <div class="coupon-code">OPEN10</div>
+    </div>
+    <div class="coupon-action">
+      <div class="coupon-note">クーポンコードは購入画面で入力してください。</div>
+    </div>
+  </div>
+</div>
 <div class="container">
   <img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_30_22_09_54.png?v=1777554646" alt="母の日ギフト">
 
@@ -47,18 +167,18 @@
     <div class="badge">名入れ無料 / ギフト対応</div>
   </div>
 
-  <div class="section">
+  <div class="section" id="productList">
     <div class="product">
       <div class="carousel" data-carousel>
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_38_41.png?v=1777551596" alt="赤ワイン Amelie"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_21_48_50.png?v=1777558381" alt="赤ワイン Amelie"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_38_41.png?v=1777551596" alt="赤ワイン Amelie"></div>
         </div>
         <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
         <button class="carousel-btn carousel-next" type="button" data-next>›</button>
         <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
       </div>
-      <div class="product-header"><div class="product-name">赤ワイン "Amelie"</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E8%B5%A4%E3%83%AF%E3%82%A4%E3%83%B3-amelie?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank">購入する</a></div>
+      <div class="product-header"><div class="product-name">赤ワイン "Amelie"</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E8%B5%A4%E3%83%AF%E3%82%A4%E3%83%B3-amelie?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
       <div class="product-desc">名前入りで贈る特別な一本。</div>
       <div class="product-price">¥4,400</div>
     </div>
@@ -66,14 +186,14 @@
     <div class="product">
       <div class="carousel" data-carousel>
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_43_05.png?v=1777551611" alt="白ワイン Emma"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_22_03_14.png?v=1777558639" alt="白ワイン Emma"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_43_05.png?v=1777551611" alt="白ワイン Emma"></div>
         </div>
         <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
         <button class="carousel-btn carousel-next" type="button" data-next>›</button>
         <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
       </div>
-      <div class="product-header"><div class="product-name">白ワイン "Emma"</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E7%99%BD%E3%83%AF%E3%82%A4%E3%83%B3-emma?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank">購入する</a></div>
+      <div class="product-header"><div class="product-name">白ワイン "Emma"</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E7%99%BD%E3%83%AF%E3%82%A4%E3%83%B3-emma?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
       <div class="product-desc">上品でやさしい味わい。</div>
       <div class="product-price">¥4,400</div>
     </div>
@@ -81,15 +201,15 @@
     <div class="product">
       <div class="carousel" data-carousel>
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_47_16.png?v=1777551916" alt="Amelie Emma 2本セット"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_21_48_50.png?v=1777558381" alt="Amelie"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_22_03_14.png?v=1777558639" alt="Emma"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_47_16.png?v=1777551916" alt="Amelie Emma 2本セット"></div>
         </div>
         <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
         <button class="carousel-btn carousel-next" type="button" data-next>›</button>
         <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span><span class="carousel-dot"></span></div>
       </div>
-      <div class="product-header"><div class="product-name">"Amelie"&"Emma" 2本セット</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-amelie-emma-2%E6%9C%AC%E3%82%BB%E3%83%83%E3%83%88?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank">購入する</a></div>
+      <div class="product-header"><div class="product-name">"Amelie"&"Emma" 2本セット</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-amelie-emma-2%E6%9C%AC%E3%82%BB%E3%83%83%E3%83%88?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
       <div class="product-desc">記念に残る贅沢セット。</div>
       <div class="product-price">¥7,700</div>
     </div>
@@ -97,44 +217,59 @@
     <div class="product">
       <div class="carousel" data-carousel>
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_49_07.png?v=1777551927" alt="Soleil"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_22_11_51.png?v=1777558710" alt="Soleil"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_49_07.png?v=1777551927" alt="Soleil"></div>
         </div>
         <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
         <button class="carousel-btn carousel-next" type="button" data-next>›</button>
         <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
       </div>
-      <div class="product-header"><div class="product-name">スパークリングワイン "Soleil"</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E3%82%B9%E3%83%91%E3%83%BC%E3%82%AF%E3%83%AA%E3%83%B3%E3%82%B0%E3%83%AF%E3%82%A4%E3%83%B3-soleil?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank">購入する</a></div>
+      <div class="product-header"><div class="product-name">スパークリングワイン "Soleil"</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E3%82%B9%E3%83%91%E3%83%BC%E3%82%AF%E3%83%AA%E3%83%B3%E3%82%B0%E3%83%AF%E3%82%A4%E3%83%B3-soleil?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
       <div class="product-desc">華やかな母の日に。</div>
+      <div class="product-price">¥5,500</div>
+    </div>
+    <div class="product">
+      <div class="carousel" data-carousel>
+        <div class="carousel-track">
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_5_1_15_51_45.png?v=1777618371" alt="ウイスキー ラベル"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_5_1_15_06_53.png?v=1777615916" alt="ウイスキー ラベル"></div>
+        </div>
+        <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
+        <button class="carousel-btn carousel-next" type="button" data-next>›</button>
+        <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
+      </div>
+      <div class="product-header"><div class="product-name">ウイスキー（ラベル）</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E3%82%AE%E3%83%95%E3%83%88-%E3%82%A6%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%A9%E3%83%99%E3%83%AB?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
+      <div class="product-desc">名前入りで贈る、上品なウイスキーギフト。</div>
       <div class="product-price">¥5,500</div>
     </div>
 
     <div class="product">
       <div class="carousel" data-carousel>
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_54_10.png?v=1777554752" alt="ウイスキー金彫刻"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_24_18_48_16_2e5f8850-b250-4332-8f1c-aaef7d30e151.png?v=1777558718" alt="ウイスキー金彫刻"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_20_54_10.png?v=1777554752" alt="ウイスキー金彫刻"></div>
         </div>
         <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
         <button class="carousel-btn carousel-next" type="button" data-next>›</button>
         <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
       </div>
-      <div class="product-header"><div class="product-name">ウイスキー（金彫刻）</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E3%82%A6%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%BC%E9%87%91%E5%BD%AB%E5%88%BB?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank">購入する</a></div>
+      <div class="product-header"><div class="product-name">ウイスキー（金彫刻）</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E3%82%A6%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%BC%E9%87%91%E5%BD%AB%E5%88%BB?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
       <div class="product-desc">記念に残る高級仕様の一本。</div>
+      <div style="color:#e53935;font-size:11px;margin-top:6px;">※こちらの商品は発送までに約1週間程度お時間をいただきます</div>
       <div class="product-price">¥7,150</div>
     </div>
 
     <div class="product">
       <div class="carousel" data-carousel>
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/1dee6b62-b638-4077-b48d-862384ae7f94.png?v=1777554759" alt="ゑびす極だし"></div>
           <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/ChatGPT_Image_2026_4_28_22_29_27.png?v=1777558770" alt="ゑびす極だし"></div>
+          <div class="carousel-slide"><img src="https://cdn.shopify.com/s/files/1/0745/0437/2445/files/1dee6b62-b638-4077-b48d-862384ae7f94.png?v=1777554759" alt="ゑびす極だし"></div>
         </div>
         <button class="carousel-btn carousel-prev" type="button" data-prev>‹</button>
         <button class="carousel-btn carousel-next" type="button" data-next>›</button>
         <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
       </div>
-      <div class="product-header"><div class="product-name">ゑびす極だし 2袋セット</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E3%82%91%E3%81%B3%E3%81%99%E6%A5%B5%E3%81%A0%E3%81%97-2%E8%A2%8B%E3%82%BB%E3%83%83%E3%83%88?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank">購入する</a></div>
+      <div class="product-header"><div class="product-name">ゑびす極だし 2袋セット</div><a class="btn" href="https://compass-linq.myshopify.com/products/%E6%AF%8D%E3%81%AE%E6%97%A5%E3%82%AE%E3%83%95%E3%83%88-%E3%82%91%E3%81%B3%E3%81%99%E6%A5%B5%E3%81%A0%E3%81%97-2%E8%A2%8B%E3%82%BB%E3%83%83%E3%83%88?utm_source=copyToPasteBoard&utm_medium=product-links&utm_content=web" target="_blank" rel="noopener noreferrer">購入する</a></div>
       <div class="product-desc">毎日の料理に使える、実用的なギフト。</div>
       <div class="product-price">¥4,180</div>
     </div>
@@ -150,6 +285,25 @@
 </div>
 
 <script>
+  var couponModal = document.getElementById('couponModal');
+  var couponClose = document.getElementById('couponClose');
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      couponModal.classList.add('show');
+    }, 600);
+  });
+
+  couponClose.addEventListener('click', function(){
+    couponModal.classList.remove('show');
+  });
+
+  couponModal.addEventListener('click', function(e){
+    if(e.target === couponModal){
+      couponModal.classList.remove('show');
+    }
+  });
+
   document.querySelectorAll('[data-carousel]').forEach(function(carousel){
     var track = carousel.querySelector('.carousel-track');
     var dots = carousel.querySelectorAll('.carousel-dot');
@@ -166,9 +320,7 @@
     function update(withTransition){
       track.style.transition = withTransition === false ? 'none' : 'transform 0.8s ease';
       track.style.transform = 'translateX(' + (-100 * index) + '%)';
-      dots.forEach(function(dot, i){
-        dot.classList.toggle('active', i === index);
-      });
+      dots.forEach(function(dot, i){ dot.classList.toggle('active', i === index); });
     }
 
     function moveNext(){
@@ -187,10 +339,7 @@
     }
 
     function stopAuto(){
-      if(interval){
-        clearInterval(interval);
-        interval = null;
-      }
+      if(interval){ clearInterval(interval); interval = null; }
     }
 
     carousel.querySelector('[data-prev]').addEventListener('click', function(){
@@ -223,19 +372,17 @@
       track.style.transform = 'translateX(calc(' + (-100 * index) + '% + ' + diff + 'px))';
     });
 
-    carousel.addEventListener('pointerup', function(e){
+    carousel.addEventListener('pointerup', function(){
       if(!isDragging) return;
       var diff = currentX - startX;
       isDragging = false;
       carousel.style.cursor = 'grab';
-
       if(Math.abs(diff) > 45){
         if(diff < 0){ moveNext(); }
         else { movePrev(); }
       } else {
         update(true);
       }
-
       startAuto();
     });
 
